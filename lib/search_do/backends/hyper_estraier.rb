@@ -127,7 +127,8 @@ module SearchDo
             attributes.each do |k,v|
               next if v.blank? or k.blank?
               column = @ar_class.columns_hash[k.to_s]
-              search_by = ((column and column.number?) ? 'NUMEQ' : 'STRINC') 
+              search_by = ((column and column.number?) ? 'NUMEQ' : 'STRINC')
+              k = translate_attribute_name_to_he(k)
               condition.add_attr "#{k} #{search_by} #{v}"
             end
           else raise
@@ -136,15 +137,23 @@ module SearchDo
 
       #pre: order not nil
       def translate_order_to_he(order)
-        order = order.to_s.downcase.strip
-        order_parts = order.split(' ') 
+        order_parts = order.to_s.downcase.strip.split(' ') 
         return order if order_parts.size > 2
         
-        case order_parts[0]
-          when 'updated_at','updated_on' then "@mdate " + numd_or_numa(order_parts[1])
-          when 'created_at','created_on' then "@cdate " + numd_or_numa(order_parts[1])
-          when 'id' then "db_id " + numd_or_numa(order_parts[1])
-          else order
+        translated = translate_attribute_name_to_he(order_parts[0])
+        if order_parts[0] == translated#just a regular column
+          order
+        else
+          "#{translated} #{numd_or_numa(order_parts[1])}"
+        end
+      end
+      
+      def translate_attribute_name_to_he(name)
+        case name
+          when 'updated_at','updated_on' then "@mdate"
+          when 'created_at','created_on' then "@cdate"
+          when 'id' then "db_id"
+          else name
         end
       end
 

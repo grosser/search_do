@@ -70,6 +70,7 @@ describe SearchDo::Backends::HyperEstraier do
           Story.columns_hash['popularity'].should be_number
           Story.columns_hash['title'].should be_text
         end
+
         it "parses a simple hash" do
           condition(:attributes=>{:a=>'b'}).attrs.should == ['a STRINC b']
         end
@@ -90,8 +91,19 @@ describe SearchDo::Backends::HyperEstraier do
           condition(:attributes=>{'title'=>12}).attrs.should == ['title STRINC 12']
         end
         
+        it "translates columns" do
+          condition(:attributes=>{'id'=>1}).attrs.should == ['db_id NUMEQ 1']
+        end
+        
         it "parses a unknown column to string search" do
           condition(:attributes=>{'xxx'=>'x'}).attrs.should == ['xxx STRINC x']
+        end
+        
+        it "parses a date or time" do
+          pending do
+            #raw output: "@mdate" "2008-09-21T09:51:27+02:00"
+            raise
+          end
         end
       end
     end
