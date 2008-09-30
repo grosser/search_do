@@ -40,21 +40,33 @@ describe SearchDo::Backends::HyperEstraier do
     end
     
     describe "translating rails-terms" do
+      def translated_order(order)
+        @backend.send(:build_fulltext_condition,'',:order=>order).order
+      end
+      
       #symbols and desc <-> DESC only need testing once, to see if order values get normalized
       ['updated_at','updated_on',:updated_at,'updated_at DESC','updated_at desc'].each do |order|
         it "translates #{order}" do
-          @backend.send(:build_fulltext_condition,'',:order=>order).order.should == "@mdate NUMD"
+          translated_order(order).should == "@mdate NUMD"
         end
       end
       ['created_at','created_on','created_at DESC'].each do |order|
         it "translates #{order}" do
-          @backend.send(:build_fulltext_condition,'',:order=>order).order.should == "@cdate NUMD"
+          translated_order(order).should == "@cdate NUMD"
         end
       end
       ['id','id DESC'].each do |order|
         it "translates #{order}" do
-          @backend.send(:build_fulltext_condition,'',:order=>order).order.should == "db_id NUMD"
+          translated_order(order).should == "db_id NUMD"
         end
+      end
+      
+      it "does not translate strange extras" do
+        translated_order('id strange').should == 'db_id strange'
+      end
+      
+      it "does not translate long orders" do
+        translated_order('id desc wtf').should == 'id desc wtf'
       end
     end
   end

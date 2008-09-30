@@ -120,16 +120,25 @@ module SearchDo
 
       def translate_order_to_he(order)
         order = order.to_s.downcase.strip
-        case order
-          when /^updated_at[ ]{0,1}/,/^updated_on[ ]{0,1}/ then "@mdate " + numd_or_numa(order)
-          when /^created_at[ ]{0,1}/,/^created_on[ ]{0,1}/ then "@cdate " + numd_or_numa(order)
-          when /^id[ ]{0,1}/ then "db_id " + numd_or_numa(order)
+        order_parts = order.split(' ') 
+        return order if order_parts.size > 2
+        
+        case order_parts[0]
+          when 'updated_at','updated_on' then "@mdate " + numd_or_numa(order_parts[1])
+          when 'created_at','created_on' then "@cdate " + numd_or_numa(order_parts[1])
+          when 'id' then "db_id " + numd_or_numa(order_parts[1])
           else order
         end
       end
 
-      def numd_or_numa(order)
-        order =~ / asc$/ ? "NUMA" : "NUMD"
+      #pre: string is downcased & stripped
+      #post: a string, never nil
+      def numd_or_numa(order_end)
+        case order_end
+          when 'asc' then "NUMA"
+          when 'desc',nil then "NUMD"
+          else order_end.to_s
+        end
       end
 
       def delete_from_index(document)
