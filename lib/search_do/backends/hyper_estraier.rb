@@ -109,15 +109,32 @@ module SearchDo
 
         cond.set_phrase Utils.tokenize_query(query)
 
-        [options[:attributes]].flatten.reject { |a| a.blank? }.each do |attr|
-          cond.add_attr attr
-        end
+        add_attributes_to(options[:attributes],cond)
         cond.set_max   options[:limit] unless options[:count]
         cond.set_skip  options[:offset]
         cond.set_order translate_order_to_he(options[:order]) if options[:order]
         return cond
       end
+      
+      def add_attributes_to(attributes,condition)
+        case attributes
+          when String,nil then condition.add_attr attributes unless attributes.blank?
+          when Array then
+            attributes.reject(&:blank?).each do |attr|
+              condition.add_attr attr
+            end
+          when Hash then
+            attributes.each do |k,v|
+              next if v.blank? or k.blank?
+              column = @ar_class.columns_hash[k.to_s]
+              search_by = ((column and column.number?) ? 'NUMEQ' : 'STRINC') 
+              condition.add_attr "#{k} #{search_by} #{v}"
+            end
+          else raise
+        end
+      end
 
+      #pre: order not nil
       def translate_order_to_he(order)
         order = order.to_s.downcase.strip
         order_parts = order.split(' ') 
@@ -136,7 +153,7 @@ module SearchDo
       def numd_or_numa(order_end)
         case order_end
           when 'asc' then "NUMA"
-          when 'desc',nil then "NUMD"
+          when 'desc','',nil then "NUMD"
           else order_end.to_s
         end
       end

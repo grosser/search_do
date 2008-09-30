@@ -39,6 +39,63 @@ describe SearchDo::Backends::HyperEstraier do
       @backend.send(:build_fulltext_condition,'',:count=>true).max.should == -1
     end
     
+    describe 'parsing attributes' do
+      def condition(options)
+        @backend.send(:build_fulltext_condition,'',options)
+      end
+      
+      it 'raises on unknown' do
+        lambda{condition(:attributes=>1)}.should raise_error(RuntimeError)
+      end
+      
+      it "removes blanks" do
+        condition(:attributes=>['','  ','a']).attrs.should == ['a']
+      end
+      
+      it 'ignores empty' do
+        condition(:attributes=>nil).attrs.should == []
+        condition(:attributes=>'').attrs.should == []
+      end
+      
+      it "parses a string" do
+        condition(:attributes=>'x y z').attrs.should == ['x y z']
+      end
+      
+      it "parses an array" do
+        condition(:attributes=>['a b c','d e f']).attrs.should == ['a b c','d e f']
+      end
+      
+      describe 'parsing a hash' do
+        before :all do
+          Story.columns_hash['popularity'].should be_number
+          Story.columns_hash['title'].should be_text
+        end
+        it "parses a simple hash" do
+          condition(:attributes=>{:a=>'b'}).attrs.should == ['a STRINC b']
+        end
+        
+        it "parses a blank hash" do
+          condition(:attributes=>{:a=>''}).attrs.should == []
+        end
+        
+        it "parses a keyless hash" do
+          condition(:attributes=>{''=>'wtf'}).attrs.should == []
+        end
+        
+        it "parses a number column to number search" do
+          condition(:attributes=>{'popularity'=>12}).attrs.should == ['popularity NUMEQ 12']
+        end
+        
+        it "parses a string column to string search" do
+          condition(:attributes=>{'title'=>12}).attrs.should == ['title STRINC 12']
+        end
+        
+        it "parses a unknown column to string search" do
+          condition(:attributes=>{'xxx'=>'x'}).attrs.should == ['xxx STRINC x']
+        end
+      end
+    end
+    
     describe "translating rails-terms" do
       def translated_order(order)
         @backend.send(:build_fulltext_condition,'',:order=>order).order
