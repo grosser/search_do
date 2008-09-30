@@ -135,7 +135,6 @@ module SearchDo
         end
       end
 
-      #pre: order not nil
       def translate_order_to_he(order)
         order_parts = order.to_s.downcase.strip.split(' ') 
         return order if order_parts.size > 2
@@ -149,7 +148,7 @@ module SearchDo
       end
       
       def translate_attribute_name_to_he(name)
-        case name
+        case name.to_s
           when 'updated_at','updated_on' then "@mdate"
           when 'created_at','created_on' then "@cdate"
           when 'id' then "db_id"
@@ -158,12 +157,11 @@ module SearchDo
       end
 
       #pre: string is downcased & stripped
-      #post: a string, never nil
       def numd_or_numa(order_end)
         case order_end
           when 'asc' then "NUMA"
           when 'desc','',nil then "NUMD"
-          else order_end.to_s
+          else order_end
         end
       end
 
