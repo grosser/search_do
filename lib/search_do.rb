@@ -214,9 +214,18 @@ module SearchDo
 
     def find_by_ids_scope(ids, options={})
       return [] if ids.blank?
+      results = []
       with_scope(:find=>{:conditions=>["#{table_name}.id IN (?)", ids]}) do
-        return find(:all, options)
+        results = find(:all, options)
       end
+      apply_ids_order_to(ids,results)
+    end
+    
+    def apply_ids_order_to(ids,results)
+      #replace id with found item
+      results.each {|item| ids[ids.index(item.id)] = item}
+      #remove the unfound
+      ids.reject {|item_or_id| item_or_id.is_a?(Fixnum)}
     end
   end
 

@@ -104,7 +104,7 @@ describe Story, "extended by acts_as_searchable_enhance" do
     end
 
     it "find_fulltext('hoge', :order=>'updated_at DESC') should == [stories(:sanshiro), stories(:neko)]" do
-      Story.find_fulltext('hoge', :order=>"updated_at DESC").should == Story.find([102,101])
+      Story.find_fulltext('hoge', :order=>"updated_at DESC").should == Story.find([102,101]).reverse
     end
   end
 
@@ -147,11 +147,13 @@ describe Story, "extended by acts_as_searchable_enhance" do
     end
     
     it "preserves order of found objects" do
-      pending do
-        Story.fulltext_search('記憶', :order => "@mdate NUMA").map(&:id).should == [102, 101]
-      end
+      Story.fulltext_search('記憶', :order => "@mdate NUMA").map(&:id).should == [102, 101]
     end
-
+    
+    it "preservers order if scope is given" do
+      pending
+    end
+    
     it "has all objects in index" do
       Story.search_backend.index.size.should == Story.count
     end
