@@ -68,11 +68,27 @@ describe Story, "extended by acts_as_searchable_enhance" do
       @story.remove_from_index
     end
   end
-
-  describe "matched_ids_and_raw => [:id,raw] and find_option=>{:condition => 'id = :id'}" do
-    def fake_raw
-      mock(:snippet=>'snip')
+  
+  describe "add_snippets" do
+    before :each do
+      @stories = Story.find :all
+      count = 0
+      @ids_and_raw = @stories.map {|story| [story.id,fake_raw(count+=1)]}
     end
+    
+    it "adds snippets to objects" do
+      Story.send(:add_snippets,@stories,@ids_and_raw)
+      @stories.map(&:snippet).should == ['snip1','snip2']
+    end
+    
+    it "adds snippets to right objects" do
+      Story.send(:add_snippets,@stories.reverse,@ids_and_raw)
+      @stories.map(&:snippet).should == ['snip1','snip2']
+    end
+  end
+
+  describe "fulltext_search" do
+    #matched_ids_and_raw => [:id,raw] and find_option=>{:condition => 'id = :id'}
     
     fixtures :stories
     before do
@@ -82,21 +98,35 @@ describe Story, "extended by acts_as_searchable_enhance" do
       Story.stub!(:matched_ids_and_raw).and_return fake_results
     end
 
-    def fulltext_search
+    def fulltext_search(query='hoge')
       finder_opt = {:conditions => ["id = ?", @story.id]}
-      Story.fulltext_search("hoge", :find => finder_opt)
+      Story.fulltext_search(query, :find => finder_opt)
     end
 
-    it "fulltext_search should find story" do
+    it "finds story" do
       fulltext_search.should == [@story]
     end
 
-    it "fulltext_search should call matched_ids_and_raw" do
-      Story.should_receive(:matched_ids_and_raw).and_return([@story.id,"Raw"])
+    it "adds snippets" do
+      fulltext_search[0].snippet.should == 'snip'
+    end
+    
+    it "does not add snippets if query is empty" do
+      fulltext_search('')[0].snippet.should be_nil
+    end
+    
+    it "does not add snippet when object does not respond to snippet=" do
+      @story.should_receive(:respond_to?).with(:snippet=).and_return false
+      Story.should_receive(:find).and_return [@story]
+      fulltext_search[0].snippet.should be_blank
+    end
+    
+    it "calls matched_ids_and_raw" do
+      Story.should_receive(:matched_ids_and_raw).and_return([[@story.id,fake_raw]])
       fulltext_search
     end
   end
-
+  
   describe "new interface Model.find_fulltext(query, options={})" do
     fixtures :stories
     
@@ -176,6 +206,10 @@ describe Story, "extended by acts_as_searchable_enhance" do
       @story.popularity = 20
       @story.save
     end
+  end
+  
+  def fake_raw(num=nil)
+    mock("Raw",:snippet=>"snip#{num}")
   end
 end
 

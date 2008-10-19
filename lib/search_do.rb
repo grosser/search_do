@@ -139,6 +139,8 @@ module SearchDo
 
     # Perform a fulltext search against the Hyper Estraier index.
     #
+    # Adds snippet to results if the model responds to snippet=
+    #
     # Options taken:
     # * <tt>limit</tt>       - Maximum number of records to retrieve (default: <tt>100</tt>)
     # * <tt>offset</tt>      - Number of records to skip (default: <tt>0</tt>)
@@ -168,7 +170,10 @@ module SearchDo
 
       ids_and_raw = matched_ids_and_raw(query, options)
       ids = ids_and_raw.map{|id,raw| id}
-      find_by_ids_scope(ids, find_options)
+      
+      results = find_by_ids_scope(ids, find_options)
+      add_snippets(results,ids_and_raw) unless query.blank?
+      results
     end
 
     def count_fulltext(query, options={})
@@ -213,6 +218,13 @@ module SearchDo
     end
 
   private
+  
+    def add_snippets(results,ids_and_raw)
+      results.each do |result|
+        raw = ids_and_raw.assoc(result.id)[1]
+        result.snippet = raw.snippet if result.respond_to?(:snippet=)
+      end
+    end
   
     def connect_backend(active_record_config) #:nodoc:
       backend_config = active_record_config[RAILS_ENV]['search'] || \
