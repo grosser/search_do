@@ -132,9 +132,7 @@ describe Story, "extended by acts_as_searchable_enhance" do
     end
     
     it "finds all object when searching for ''" do
-      pending do
-        Story.fulltext_search('').size.should == Story.count
-      end
+      Story.fulltext_search('').size.should == Story.count
     end
 
     # asserts HE raw_match order

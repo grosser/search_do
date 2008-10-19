@@ -109,6 +109,8 @@ module SearchDo
 
         cond.set_phrase Utils.tokenize_query(query)
 
+        #add a always-true condition to trigger find all
+        add_attributes_to("db_id NUMGT 0",cond) if query.blank?
         add_attributes_to(options[:attributes],cond)
         cond.set_max   options[:limit] unless options[:count]
         cond.set_skip  options[:offset]

@@ -41,7 +41,7 @@ describe SearchDo::Backends::HyperEstraier do
     
     describe 'parsing attributes' do
       def condition(options)
-        @backend.send(:build_fulltext_condition,'',options)
+        @backend.send(:build_fulltext_condition,'something',options)
       end
       
       it 'raises on unknown' do
@@ -57,6 +57,10 @@ describe SearchDo::Backends::HyperEstraier do
         condition(:attributes=>'').attrs.should == []
       end
       
+      it "adds a always-true condition when search is blank" do
+        @backend.send(:build_fulltext_condition,'  ').attrs.should_not be_blank
+      end
+      
       it "parses a string" do
         condition(:attributes=>'x y z').attrs.should == ['x y z']
       end
@@ -64,6 +68,7 @@ describe SearchDo::Backends::HyperEstraier do
       it "parses an array" do
         condition(:attributes=>['a b c','d e f']).attrs.should == ['a b c','d e f']
       end
+      
       
       describe 'parsing a hash' do
         before :all do
