@@ -127,6 +127,27 @@ describe Story, "extended by acts_as_searchable_enhance" do
     end
   end
   
+  describe "paginate_by_fulltext_search" do
+    before do
+      Story.stub!(:fulltext_search).and_return [Story.first]
+      Story.stub!(:count_fulltext).and_return 1
+    end
+    
+    it "has total_entries" do
+      Story.paginate_by_fulltext_search('',:page=>1,:per_page=>1).total_entries.should == 1
+    end
+    
+    it "translates paginate terms to limit and offset and removes page/per_page" do
+      Story.should_receive(:fulltext_search).with('x',{:limit=>3,:offset=>6}).and_return []
+      Story.paginate_by_fulltext_search('x',:page=>3,:per_page=>3)
+    end
+    
+    it "calculates total_entries from search results" do
+      Story.should_receive(:count_fulltext).never
+      Story.paginate_by_fulltext_search('',:page=>1,:per_page=>2).total_entries.should == 1
+    end
+  end
+  
   describe "new interface Model.find_fulltext(query, options={})" do
     fixtures :stories
     

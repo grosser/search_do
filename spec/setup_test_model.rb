@@ -2,6 +2,10 @@ require 'rubygems'
 require 'active_record'
 require 'active_record/fixtures'
 
+#activate will_paginate for models
+require 'will_paginate'
+WillPaginate.enable_activerecord
+
 ActiveRecord::Schema.define(:version => 1) do
   create_table "stories" do |t|
     t.string   "title"

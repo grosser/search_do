@@ -176,6 +176,27 @@ module SearchDo
       results
     end
 
+
+    def paginate_by_fulltext_search(query, options={})
+      WillPaginate::Collection.create(*wp_parse_options(options)) do |pager|
+        #transform acts_as_searchable options to will_paginate options
+        page,per_page,total = wp_parse_options(options)
+        options[:limit]=per_page
+        options[:offset]=(page.to_i-1)*per_page
+        options.delete(:page)#acts_as cannot read this...
+        options.delete(:per_page)#acts_as cannot read this...
+        
+        #find results
+        pager.replace fulltext_search(query,options)
+
+        #total items
+        #replace sets total if it can calculate by them itself
+        unless pager.total_entries
+          pager.total_entries = count_fulltext(query, options[:attributes]||{})
+        end
+      end
+    end
+
     def count_fulltext(query, options={})
       search_backend.count(query, options)
     end
