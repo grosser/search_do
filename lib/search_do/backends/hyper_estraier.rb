@@ -64,7 +64,11 @@ module SearchDo
       end
 
       def search_all_ids(query, options ={})
-        search_all(query, options).map{|doc| doc.attr("db_id").to_i }
+        search_all_ids_and_raw(query,options).map {|row|row[0]}
+      end
+      
+      def search_all_ids_and_raw(query, options ={})
+        search_all(query, options).map{|doc| [doc.attr("db_id").to_i,doc] }
       end
 
       def add_to_index(texts, attrs)

@@ -69,12 +69,13 @@ describe Story, "extended by acts_as_searchable_enhance" do
     end
   end
 
-  describe "matched_ids => [:id] and find_option=>{:condition => 'id = :id'}" do
+  describe "matched_ids_and_raw => [:id,raw] and find_option=>{:condition => 'id = :id'}" do
     fixtures :stories
     before do
       stories = Story.find(:all)
       @story = stories.first
-      Story.stub!(:matched_ids).and_return( stories.map(&:id) )
+      fake_results = stories.map{|story| [story.id,'raw']}
+      Story.stub!(:matched_ids_and_raw).and_return fake_results
     end
 
     def fulltext_search
@@ -82,21 +83,17 @@ describe Story, "extended by acts_as_searchable_enhance" do
       Story.fulltext_search("hoge", :find => finder_opt)
     end
 
-    it "fulltext_search should not raise error AR::RecordNotFound" do
-      lambda{ fulltext_search }.should_not raise_error(ActiveRecord::RecordNotFound)
-    end
-
-    it "fulltext_search should == [@story]" do
+    it "fulltext_search should find story" do
       fulltext_search.should == [@story]
     end
 
-    it "fulltext_search should call matched_ids" do
-      Story.should_receive(:matched_ids).and_return([@story.id])
+    it "fulltext_search should call matched_ids_and_raw" do
+      Story.should_receive(:matched_ids_and_raw).and_return([@story.id,"Raw"])
       fulltext_search
     end
   end
 
-  describe "new intefrface Model.find_fulltext(query, options={})" do
+  describe "new interface Model.find_fulltext(query, options={})" do
     fixtures :stories
     
     before do

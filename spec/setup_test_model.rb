@@ -12,6 +12,7 @@ ActiveRecord::Schema.define(:version => 1) do
 end
 
 class Story < ActiveRecord::Base
+  attr_accessor :snippet
   acts_as_searchable :searchable_fields=>[:title, :body]
 end
 

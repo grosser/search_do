@@ -166,7 +166,8 @@ module SearchDo
       find_options = options[:find] || {}
       [ :limit, :offset ].each { |k| find_options.delete(k) } unless find_options.blank?
 
-      ids = matched_ids(query, options)
+      ids_and_raw = matched_ids_and_raw(query, options)
+      ids = ids_and_raw.map{|id,raw| id}
       find_by_ids_scope(ids, find_options)
     end
 
@@ -183,13 +184,19 @@ module SearchDo
       find_by_ids_scope(ids, options)
     end
 
+    #[[1,Raw],[4,Raw],...]
+    def matched_ids_and_raw(query = "", options = {})
+      search_backend.search_all_ids_and_raw(query, options)
+    end
+    
     def matched_ids(query = "", options = {})
-      search_backend.search_all_ids(query, options)
+      matched_ids_and_raw(query,options).map{|id,raw|id}
     end
 
-    def raw_matches(query = "", options = {})
-      search_backend.search_all(query, options)
+    def matched_raw(query = "", options = {})
+      matched_ids_and_raw(query,options).map{|id,raw|raw}
     end
+    alias :raw_matches :matched_raw
 
     def raw_fulltext_index
       search_backend.index
@@ -205,7 +212,8 @@ module SearchDo
       find(:all).each { |r| r.update_index(true) }
     end
 
-    private
+  private
+  
     def connect_backend(active_record_config) #:nodoc:
       backend_config = active_record_config[RAILS_ENV]['search'] || \
                        active_record_config[RAILS_ENV]['estraier'] || {}
