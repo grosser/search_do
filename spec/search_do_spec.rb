@@ -32,7 +32,7 @@ describe Story, "extended by acts_as_searchable_enhance" do
     end
   end
 
-  describe "extract matched_ids from fulltext_search" do
+  describe "matched_ids" do
     fixtures :stories
     before do
       @story_ids = Story.find(:all, :limit=>2).map(&:id)
@@ -42,11 +42,11 @@ describe Story, "extended by acts_as_searchable_enhance" do
       Story.search_backend.connection.stub!(:search).and_return(nres)
     end
 
-    it "matched_ids should == [story_ids]" do
+    it "finds all story ids" do
       Story.matched_ids("hoge").should == @story_ids
     end
 
-    it "matched_ids should call EstraierPure::Node#search()" do
+    it "calls EstraierPure::Node#search()" do
       Story.search_backend.connection.should_receive(:search)
       Story.matched_ids("hoge")
     end
@@ -70,11 +70,15 @@ describe Story, "extended by acts_as_searchable_enhance" do
   end
 
   describe "matched_ids_and_raw => [:id,raw] and find_option=>{:condition => 'id = :id'}" do
+    def fake_raw
+      mock(:snippet=>'snip')
+    end
+    
     fixtures :stories
     before do
       stories = Story.find(:all)
       @story = stories.first
-      fake_results = stories.map{|story| [story.id,'raw']}
+      fake_results = stories.map{|story| [story.id,fake_raw]}
       Story.stub!(:matched_ids_and_raw).and_return fake_results
     end
 
