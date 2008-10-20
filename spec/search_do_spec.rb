@@ -171,6 +171,7 @@ describe Story, "extended by acts_as_searchable_enhance" do
       Story.clear_index!
       #Story.delete_all
       Story.create!(:title=>"むかしむかし", :body=>"あるところにおじいさんとおばあさんが")
+      Story.create!(:title=>"i am so blue", :body=>"testing makes me happy",:non_column=>'non column value')
       Story.reindex!
       # waiting Estraier sync index, adjust 'cachernum' in ${estraier}/_conf if need
       sleep 1
@@ -190,6 +191,22 @@ describe Story, "extended by acts_as_searchable_enhance" do
     
     it "finds all object when searching for ''" do
       Story.fulltext_search('').size.should == Story.count
+    end
+    
+    it "finds using long strings" do
+      pending do 
+        Story.fulltext_search("i am so blue").size.should == 1
+      end
+    end
+    
+    it "finds using attributes" do
+      Story.fulltext_search('',:attributes=>{:body=>'るとこ'}).size.should == 1
+    end
+    
+    it "finds using non_column attributes" do
+      pending do
+        Story.fulltext_search('',:attributes=>{:non_column=>'non column value'}).size.should == 1
+      end
     end
 
     # asserts HE raw_match order
@@ -221,15 +238,15 @@ describe Story, "extended by acts_as_searchable_enhance" do
       @story.stub!(:record_timestamps).and_return(false)
     end
 
-    it "should update fulltext index when update 'title'" do
+    it "updates when changing indexed column" do
       Story.search_backend.should_receive(:add_to_index).once
       @story.title = "new title"
       @story.save
     end
 
-    it "should update fulltext index when update 'popularity'" do
+    it "does not updates when changing unindexed column" do
       Story.search_backend.should_not_receive(:add_to_index)
-      @story.popularity = 20
+      @story.popularity += 10
       @story.save
     end
   end
@@ -247,12 +264,19 @@ describe "StoryWithoutAutoUpdate" do
     end
   end
 
-  it "should have callbak :update_index" do
+  it "should not have callbak :update_index" do
     StoryWithoutAutoUpdate.after_update.should_not include(:update_index)
   end
 
-  it "should have callbak :add_to_index" do
+  it "should not have callbak :add_to_index" do
     StoryWithoutAutoUpdate.after_create.should_not include(:add_to_index)
+  end
+  
+  it "should not call add_to_index" do
+    story = StoryWithoutAutoUpdate.new
+    StoryWithoutAutoUpdate.search_backend.should_not_receive(:add_to_index)
+    story.popularity = 20
+    story.save
   end
 end
 

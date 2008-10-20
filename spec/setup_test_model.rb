@@ -19,7 +19,7 @@ end
 #create model
 class Story < ActiveRecord::Base
   attr_accessor :snippet
-  acts_as_searchable :searchable_fields=>[:title, :body],:attributes=>{:non_column=>nil}
+  acts_as_searchable :searchable_fields=>[:title, :body],:attributes=>{:non_column=>nil,:body=>nil}
   
   def non_column
     @non_column
