@@ -34,6 +34,17 @@ describe SearchDo::Backends::HyperEstraier do
     end
   end
   
+  describe "raw" do
+    before do
+      @backend.add_to_index([], 'db_id' => "1", '@uri' => "/Story/1")
+    end
+    
+    it "finds a raw document" do
+      @backend.raw(1).should_not be_nil
+      @backend.raw(1).attr('db_id').should == '1'
+    end
+  end
+  
   describe "building conditions" do
     it "does not use limit for counting" do
       @backend.send(:build_fulltext_condition,'',:count=>true).max.should == -1

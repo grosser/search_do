@@ -142,6 +142,11 @@ describe Story, "extended by acts_as_searchable_enhance" do
       Story.paginate_by_fulltext_search('x',:page=>3,:per_page=>3)
     end
     
+    it "uses search word and attributes for count query" do
+      Story.should_receive(:count_fulltext).with('x',:attributes=>'something').and_return 1
+      Story.paginate_by_fulltext_search('x',:page=>1,:per_page=>1,:attributes=>'something')
+    end
+    
     it "calculates total_entries from search results" do
       Story.should_receive(:count_fulltext).never
       Story.paginate_by_fulltext_search('',:page=>1,:per_page=>2).total_entries.should == 1

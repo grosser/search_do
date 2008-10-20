@@ -90,6 +90,14 @@ module SearchDo
         benchmark("  Deleting all index"){ index.each { |d| delete_from_index(d) } }
       end
 
+      def raw(id)
+        condition = build_fulltext_condition
+        add_attributes_to "db_id STREQ #{id}", condition
+        result = connection.search(condition, 1)
+        return unless result and result.doc_num > 0
+        result.docs[0]
+      end
+
     private
 
       def raw_search(cond, num)
@@ -141,6 +149,7 @@ module SearchDo
         end
       end
 
+      #FIXME translate numerical and date columns to NUMD/A and strings to ??/??
       def translate_order_to_he(order)
         order_parts = order.to_s.downcase.strip.split(' ') 
         return order if order_parts.size > 2

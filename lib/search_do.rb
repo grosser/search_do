@@ -194,7 +194,7 @@ module SearchDo
         #total items
         #replace sets total if it can calculate by them itself
         unless pager.total_entries
-          pager.total_entries = count_fulltext(query, options[:attributes]||{})
+          pager.total_entries = count_fulltext(query, :attributes=>options[:attributes]||{})
         end
       end
     end
