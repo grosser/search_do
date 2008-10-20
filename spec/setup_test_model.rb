@@ -6,6 +6,7 @@ require 'active_record/fixtures'
 require 'will_paginate'
 WillPaginate.enable_activerecord
 
+#create model table
 ActiveRecord::Schema.define(:version => 1) do
   create_table "stories" do |t|
     t.string   "title"
@@ -15,12 +16,13 @@ ActiveRecord::Schema.define(:version => 1) do
   end
 end
 
+#create model
 class Story < ActiveRecord::Base
   attr_accessor :snippet
   acts_as_searchable :searchable_fields=>[:title, :body]
 end
 
+#create node
 require File.expand_path("../lib/estraier_admin", File.dirname(__FILE__))
 admin = EstraierAdmin.new(ActiveRecord::Base.configurations["test"][:estraier])
 admin.create_node(Story.search_backend.node_name)
-

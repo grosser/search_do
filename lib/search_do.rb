@@ -38,6 +38,7 @@ require 'vendor/estraierpure'
 # Example:
 #
 #   class Article < ActiveRecord::Base
+#     attr_accessor :snippet
 #     acts_as_searchable
 #   end
 #
@@ -139,7 +140,7 @@ module SearchDo
 
     # Perform a fulltext search against the Hyper Estraier index.
     #
-    # Adds snippet to results if the model responds to snippet=
+    # Adds snippet (text that surround the place where the word was found) to results if the model responds to snippet=
     #
     # Options taken:
     # * <tt>limit</tt>       - Maximum number of records to retrieve (default: <tt>100</tt>)
@@ -155,8 +156,10 @@ module SearchDo
     #   Article.fulltext_search("biscuits AND gravy")
     #   Article.fulltext_search("biscuits AND gravy", :limit => 15, :offset => 14)
     #   Article.fulltext_search("biscuits AND gravy", :attributes => "tag STRINC food")
+    #   Article.fulltext_search("biscuits AND gravy", :attributes => {:user_id=>1})
+    #   Article.fulltext_search("biscuits AND gravy", :attributes => {:tag=>'food'})
     #   Article.fulltext_search("biscuits AND gravy", :attributes => ["tag STRINC food", "@title STRBW Biscuit"])
-    #   Article.fulltext_search("biscuits AND gravy", :order => "@title STRA")
+    #   Article.fulltext_search("biscuits AND gravy", :order => "created_at DESC")
     #   Article.fulltext_search("biscuits AND gravy", :raw_matches => true)
     #   Article.fulltext_search("biscuits AND gravy", :find => { :order => :title, :include => :comments })
     #
@@ -175,7 +178,6 @@ module SearchDo
       add_snippets(results,ids_and_raw) unless query.blank?
       results
     end
-
 
     def paginate_by_fulltext_search(query, options={})
       WillPaginate::Collection.create(*wp_parse_options(options)) do |pager|

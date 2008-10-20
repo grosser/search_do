@@ -104,7 +104,7 @@ module SearchDo
         end
       end
 
-      def build_fulltext_condition(query, options = {})
+      def build_fulltext_condition(query='', options = {})
         options = {:limit => 100, :offset => 0}.merge(options)
         # options.assert_valid_keys(VALID_FULLTEXT_OPTIONS)
 

@@ -19,14 +19,13 @@ A working Hyper Estraier instance, setup instructions:
 
 * http://hyperestraier.sourceforge.net/nguide-en.html
 * http://pragmatig.wordpress.com/2008/05/06/getting-started-with-acts_as_searchable-on-ubuntu/
+* rake search:node:create MODEL=User RAILS_ENV=production - for every model/environment you use
 
-At http://localhost:1978/ create one node for every model you want to use.
-When node_prefix(or node) in you config.yml is 'xx_test' then you have to create 
-xx_test_articles and xx_test_pages to index Article and Page (node + table_name).
 
 == Install
 
 * script/plugin install git://github.com/moro/search_do.git
+* install will_paginate to use "paginate_by_fulltext_search" (Instruction: http://github.com/mislav/will_paginate/wikis/installation)
 
 
 == Bugtracking
