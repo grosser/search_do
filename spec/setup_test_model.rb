@@ -19,7 +19,15 @@ end
 #create model
 class Story < ActiveRecord::Base
   attr_accessor :snippet
-  acts_as_searchable :searchable_fields=>[:title, :body]
+  acts_as_searchable :searchable_fields=>[:title, :body],:attributes=>{:non_column=>nil}
+  
+  def non_column
+    @non_column
+  end
+  
+  def non_column=(val)
+    @non_column=val
+  end
 end
 
 #create node
