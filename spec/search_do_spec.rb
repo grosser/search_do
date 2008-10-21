@@ -264,11 +264,11 @@ describe "StoryWithoutAutoUpdate" do
     end
   end
 
-  it "should not have callbak :update_index" do
+  it "should not have callback :update_index" do
     StoryWithoutAutoUpdate.after_update.should_not include(:update_index)
   end
 
-  it "should not have callbak :add_to_index" do
+  it "should not have callback :add_to_index" do
     StoryWithoutAutoUpdate.after_create.should_not include(:add_to_index)
   end
   
@@ -282,6 +282,10 @@ end
 
 describe SearchDo::Utils do
   describe "tokenize_query" do
+    it "converts nil to empty string" do
+      SearchDo::Utils.tokenize_query(nil).should == ''
+    end
+    
     it "does not convert empty strings to nil" do
       SearchDo::Utils.tokenize_query('').should == ''
     end
