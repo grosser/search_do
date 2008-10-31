@@ -194,9 +194,7 @@ describe Story, "extended by acts_as_searchable_enhance" do
     end
     
     it "finds using long strings" do
-      pending do 
-        Story.fulltext_search("i am so blue").size.should == 1
-      end
+      Story.fulltext_search("i am so blue").size.should == 1
     end
     
     it "finds using attributes" do
@@ -283,23 +281,23 @@ end
 describe SearchDo::Utils do
   describe "tokenize_query" do
     it "converts nil to empty string" do
-      SearchDo::Utils.tokenize_query(nil).should == ''
+      SearchDo::Utils.cleanup_query(nil).should == ''
     end
     
     it "does not convert empty strings to nil" do
-      SearchDo::Utils.tokenize_query('').should == ''
-    end
-    
-    it "combines words with AND'" do
-      SearchDo::Utils.tokenize_query('ruby vim').should == 'ruby AND vim'
+      SearchDo::Utils.cleanup_query('').should == ''
     end
 
-    it %[coverts '"ruby on rails" vim' to 'ruby on rails AND vim'] do
-      SearchDo::Utils.tokenize_query('"ruby on rails" vim').should == 'ruby on rails AND vim'
+    it "does not alter search terms'" do
+      SearchDo::Utils.cleanup_query('ruby vim').should == 'ruby vim'
     end
 
-    it %[converts long unicode spaces] do
-      SearchDo::Utils.tokenize_query('"ruby on rails"　vim').should == 'ruby on rails AND vim'
+    it "leaves in quotes" do
+      SearchDo::Utils.cleanup_query('"ruby on rails" vim').should == '"ruby on rails" vim'
+    end
+
+    it "converts long unicode spaces" do
+      SearchDo::Utils.cleanup_query('rails　vim').should == 'rails vim'
     end
   end
 end

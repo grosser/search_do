@@ -119,7 +119,7 @@ module SearchDo
         cond = EstraierPure::Condition::new
         cond.set_options(EstraierPure::Condition::SIMPLE | EstraierPure::Condition::USUAL)
 
-        cond.set_phrase Utils.tokenize_query(query)
+        cond.set_phrase Utils.cleanup_query(query)
 
         #add a always-true condition to trigger find all
         add_attributes_to("db_id NUMGT 0",cond) if query.blank?
