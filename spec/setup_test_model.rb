@@ -9,6 +9,8 @@ WillPaginate.enable_activerecord
 #create model table
 ActiveRecord::Schema.define(:version => 1) do
   create_table "stories" do |t|
+    t.date     "written_on"
+    t.datetime "read_at"
     t.string   "title"
     t.text     "body"
     t.integer  "popularity", :default =>0

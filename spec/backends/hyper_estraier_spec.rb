@@ -45,7 +45,7 @@ describe SearchDo::Backends::HyperEstraier do
     end
   end
   
-  describe "building conditions" do
+  describe :build_fulltext_condition do
     it "does not use limit for counting" do
       @backend.send(:build_fulltext_condition,'',:count=>true).max.should == -1
     end
@@ -124,34 +124,65 @@ describe SearchDo::Backends::HyperEstraier do
       end
     end
     
-    describe "translating rails-terms" do
+    describe "translate order" do
       def translated_order(order)
         @backend.send(:build_fulltext_condition,'',:order=>order).order
       end
       
-      #symbols and desc <-> DESC only need testing once, to see if order values get normalized
-      ['updated_at','updated_on',:updated_at,'updated_at DESC','updated_at desc'].each do |order|
-        it "translates #{order}" do
-          translated_order(order).should == "@mdate NUMD"
-        end
-      end
-      ['created_at','created_on','created_at DESC'].each do |order|
-        it "translates #{order}" do
-          translated_order(order).should == "@cdate NUMD"
-        end
-      end
-      ['id','id DESC'].each do |order|
-        it "translates #{order}" do
-          translated_order(order).should == "db_id NUMD"
-        end
+      it "translates dates to NUMD" do
+        translated_order(:written_on).should == "written_on NUMD"
       end
       
-      it "does not translate strange extras" do
-        translated_order('id strange').should == 'db_id strange'
+      it "translates datetimes to NUM" do
+        translated_order("read_at ASC").should == "read_at NUMA"
       end
       
-      it "does not translate long orders" do
-        translated_order('id desc wtf').should == 'id desc wtf'
+      it "translates numbers to NUMD" do
+        translated_order(:popularity).should == "popularity NUMD"
+      end
+      
+      it "translates numbers with asc to NUMA" do
+        translated_order("popularity ASC").should == "popularity NUMA"
+      end
+      
+      it "does not translate non-columns" do
+        translated_order("paid_at ASC").should == "paid_at ASC"
+      end
+      
+      describe "translating rails-terms" do
+        before :all do
+          class FakeColumn
+            def number?;false;end
+            def type;:date;end
+          end
+          Story.columns_hash["created_on"] = FakeColumn.new
+          Story.columns_hash["updated_on"] = FakeColumn.new
+        end
+        
+        #symbols and desc <-> DESC only need testing once, to see if order values get normalized
+        ['updated_at','updated_on',:updated_at,'updated_at DESC','updated_at desc'].each do |order|
+          it "translates #{order}" do
+            translated_order(order).should == "@mdate NUMD"
+          end
+        end
+        ['created_at','created_on','created_at DESC'].each do |order|
+          it "translates #{order}" do
+            translated_order(order).should == "@cdate NUMD"
+          end
+        end
+        ['id','id DESC'].each do |order|
+          it "translates #{order}" do
+            translated_order(order).should == "db_id NUMD"
+          end
+        end
+        
+        it "does not translate strange extras" do
+          translated_order('id strange').should == 'db_id strange'
+        end
+        
+        it "does not translate long orders" do
+          translated_order('id desc wtf').should == 'id desc wtf'
+        end
       end
     end
   end

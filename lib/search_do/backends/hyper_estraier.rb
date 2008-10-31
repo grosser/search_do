@@ -155,11 +155,13 @@ module SearchDo
         return order if order_parts.size > 2
         
         translated = translate_attribute_name_to_he(order_parts[0])
-        if order_parts[0] == translated#just a regular column
-          order
-        else
-          "#{translated} #{numd_or_numa(order_parts[1])}"
+        
+        if column = @ar_class.columns_hash[order_parts[0]]
+          if column.number? or [:datetime,:time,:date,:timestamp].include?(column.type)  
+            return "#{translated} #{numd_or_numa(order_parts[1])}"
+          end
         end
+        order
       end
       
       def translate_attribute_name_to_he(name)
