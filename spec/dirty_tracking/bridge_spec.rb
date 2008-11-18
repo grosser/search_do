@@ -1,6 +1,6 @@
 require File.expand_path("../spec_helper", File.dirname(__FILE__))
 
-describe "need_update_index?" do
+describe :need_update_index? do
   def needs
     @story.send(:need_update_index?)
   end
@@ -18,7 +18,7 @@ describe "need_update_index?" do
     needs.should be_true
   end
   
-  it "needs update when a non-column changes" do
+  it "needs update when a indexed non-column changes" do
     pending do
       @story.non_column = "new value"
       needs.should be_true

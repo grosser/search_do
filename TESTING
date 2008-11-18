@@ -9,4 +9,8 @@ rake spec
 
 if you have test errors by HyperEstraier cache matter
 edit '${estraier_index_dir}/_conf' and set 'cachernum' parameter to 0.
+(Ubuntu: /var/lib/hyperestraier/estmaster/_conf)
+then restart hyperestraier
+(Ubuntu: sudo /etc/init.d/hyperestraier restart)
+
 

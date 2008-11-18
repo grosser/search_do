@@ -88,7 +88,7 @@ describe SearchDo::Backends::HyperEstraier do
         end
 
         it "parses a simple hash" do
-          condition(:attributes=>{:a=>'b'}).attrs.should == ['a STRINC b']
+          condition(:attributes=>{:a=>'b'}).attrs.should == ['a iSTRINC b']
         end
         
         it "parses a blank hash" do
@@ -104,7 +104,7 @@ describe SearchDo::Backends::HyperEstraier do
         end
         
         it "parses a string column to string search" do
-          condition(:attributes=>{'title'=>12}).attrs.should == ['title STRINC 12']
+          condition(:attributes=>{'title'=>12}).attrs.should == ['title iSTRINC 12']
         end
         
         it "translates columns" do
@@ -112,7 +112,7 @@ describe SearchDo::Backends::HyperEstraier do
         end
         
         it "parses a unknown column to string search" do
-          condition(:attributes=>{'xxx'=>'x'}).attrs.should == ['xxx STRINC x']
+          condition(:attributes=>{'xxx'=>'x'}).attrs.should == ['xxx iSTRINC x']
         end
         
         it "parses a date or time" do
@@ -128,7 +128,18 @@ describe SearchDo::Backends::HyperEstraier do
       def translated_order(order)
         @backend.send(:build_fulltext_condition,'',:order=>order).order
       end
-      
+
+      it "translates strings to STRA" do
+        translated_order('title ASC').should == 'title STRA'
+        translated_order('title asc').should == 'title STRA'
+      end
+
+      it "translates strings to STRD" do
+        translated_order('title').should == 'title STRD'
+        translated_order('title DESC').should == 'title STRD'
+        translated_order('title desc').should == 'title STRD'
+      end
+
       it "translates dates to NUMD" do
         translated_order(:written_on).should == "written_on NUMD"
       end
@@ -145,8 +156,8 @@ describe SearchDo::Backends::HyperEstraier do
         translated_order("popularity ASC").should == "popularity NUMA"
       end
       
-      it "does not translate non-columns" do
-        translated_order("paid_at ASC").should == "paid_at ASC"
+      it "translate non-columns to string" do
+        translated_order("paid_at ASC").should == "paid_at STRA"
       end
       
       describe "translating rails-terms" do
@@ -157,6 +168,10 @@ describe SearchDo::Backends::HyperEstraier do
           end
           Story.columns_hash["created_on"] = FakeColumn.new
           Story.columns_hash["updated_on"] = FakeColumn.new
+        end
+
+        after :all do
+          Story.reset_column_information
         end
         
         #symbols and desc <-> DESC only need testing once, to see if order values get normalized
@@ -176,8 +191,8 @@ describe SearchDo::Backends::HyperEstraier do
           end
         end
         
-        it "does not translate strange extras" do
-          translated_order('id strange').should == 'db_id strange'
+        it "does not translate strange things" do
+          translated_order('id strange').should == 'id strange'
         end
         
         it "does not translate long orders" do

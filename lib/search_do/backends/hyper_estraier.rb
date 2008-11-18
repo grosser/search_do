@@ -138,30 +138,36 @@ module SearchDo
               condition.add_attr attr
             end
           when Hash then
-            attributes.each do |k,v|
-              next if v.blank? or k.blank?
-              column = @ar_class.columns_hash[k.to_s]
-              search_by = ((column and column.number?) ? 'NUMEQ' : 'STRINC')
-              k = translate_attribute_name_to_he(k)
-              condition.add_attr "#{k} #{search_by} #{v}"
+            attributes.each do |attribute,value|
+              next if value.blank? or attribute.blank?
+              search_type = search_type_for_attribute(attribute)
+              attribute = translate_attribute_name_to_he(attribute)
+              condition.add_attr "#{attribute} #{search_type} #{value}"
             end
           else raise
         end
       end
 
-      #FIXME translate numerical and date columns to NUMD/A and strings to ??/??
+      def search_type_for_attribute(attribute)
+        column_type_of(attribute) == :numeric ? 'NUMEQ' : 'iSTRINC'
+      end
+
       def translate_order_to_he(order)
         order_parts = order.to_s.downcase.strip.split(' ') 
         return order if order_parts.size > 2
+        return order unless a_or_d(order_parts[1])
         
         translated = translate_attribute_name_to_he(order_parts[0])
-        
-        if column = @ar_class.columns_hash[order_parts[0]]
-          if column.number? or [:datetime,:time,:date,:timestamp].include?(column.type)  
-            return "#{translated} #{numd_or_numa(order_parts[1])}"
-          end
-        end
-        order
+        sort_word = (column_type_of(order_parts[0])==:numeric) ? 'NUM' : 'STR'
+        "#{translated} #{sort_word}#{a_or_d(order_parts[1])}"
+      end
+
+      #is the column numeric(numbers/dates) or string(else) ?
+      def column_type_of(attribute)
+        column = @ar_class.columns_hash[attribute.to_s]
+        return :string unless column
+        return :numeric if column.number? or [:datetime,:time,:date,:timestamp].include?(column.type)
+        return :string
       end
       
       def translate_attribute_name_to_he(name)
@@ -174,11 +180,11 @@ module SearchDo
       end
 
       #pre: string is downcased & stripped
-      def numd_or_numa(order_end)
+      def a_or_d(order_end)
         case order_end
-          when 'asc' then "NUMA"
-          when 'desc','',nil then "NUMD"
-          else order_end
+          when 'asc' then "A"
+          when 'desc','',nil then "D"
+          else nil
         end
       end
 

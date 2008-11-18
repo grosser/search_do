@@ -177,7 +177,7 @@ describe Story, "extended by acts_as_searchable_enhance" do
       sleep 1
     end
 
-    before(:each) do
+    before do
       @story = Story.find_by_title("むかしむかし")
     end
 
@@ -198,9 +198,25 @@ describe Story, "extended by acts_as_searchable_enhance" do
     end
     
     it "finds using attributes" do
+      #FIXME this fails if iSTRAND is used, why?
       Story.fulltext_search('',:attributes=>{:body=>'るとこ'}).size.should == 1
     end
-    
+
+    it "finds using long strings in attributes" do
+      Story.fulltext_search('',:attributes=>{:body=>'testing makes'}).size.should == 1
+    end
+
+    it "finds using long strings using and in attributes" do
+      pending do
+        #FIXME this works if iSTRAND is used, but then "finds using attributes" fails
+        Story.fulltext_search('',:attributes=>{:body=>'testing makes happy'}).size.should == 1
+      end
+    end
+
+    it "finds using upper or lowercase attributes" do
+      Story.fulltext_search('',:attributes=>{:body=>'MakeS'}).size.should == 1
+    end
+
     it "finds using non_column attributes" do
       pending do
         Story.fulltext_search('',:attributes=>{:non_column=>'non column value'}).size.should == 1
