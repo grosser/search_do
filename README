@@ -29,6 +29,7 @@ A working Hyper Estraier instance, setup instructions:
       #fields used for attribute search/ordering
       :attributes => {:name=>nil,:city=>nil,:country=>nil,:age=>nil}
     )
+    attr_accessor :snippet #add this to get snippets on your results (see below)
   end
 
   #SEARCH
