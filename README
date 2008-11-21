@@ -5,16 +5,8 @@ Library for fulltext search integration with active record using multiple backen
 Supports:
 Hyper Estraier (http://hyperestraier.sourceforge.net/) an ActiveRecord model.
 
-Original is written by scoop see
-- http://github.com/scoop/acts_as_searchable/tree/master
-- http://poocs.net/2006/4/6/introducing-acts-as-searchable
-
-This fork is maintained by MOROHASHI Kyosuke
-- http://github.com/moro/search_do/tree/master
-
 
 == Pre-requisites
-
 A working Hyper Estraier instance, setup instructions:
 
 * http://hyperestraier.sourceforge.net/nguide-en.html
@@ -23,11 +15,49 @@ A working Hyper Estraier instance, setup instructions:
 
 
 == Install
-
 * script/plugin install git://github.com/moro/search_do.git
 * install will_paginate to use "paginate_by_fulltext_search" (Instruction: http://github.com/mislav/will_paginate/wikis/installation)
+
+
+== Usage
+
+  #MODEL
+  class User < ActiveRecord::Base
+    acts_as_searchable(
+      #fields the will be found in fulltext search
+      :searchable_fields => [:name,:website,:city,:about],
+      #fields used for attribute search/ordering
+      :attributes => {:name=>nil,:city=>nil,:country=>nil,:age=>nil}
+    )
+  end
+
+  #SEARCH
+  Users who:
+   - contain 'hello' in any of their searchable fields
+   - whose website attribute contains 'www' (contains search for strings)
+   - whose age is 1 (exact match for numbers/dates)
+   - sorted by age ASC
+  @results = User.paginate_by_fulltext_search('hello',:attributes=>{:website=>'www',:age=>1},:order=>'age ASC',:page=>1,:per_page=>20)
+
+  (Same can be done without pagination magic: User.fulltext_search)
+
+  #SNIPPETS
+  Each record found with a fulltext-search (not a attribute-only search) contains a snippet
+  of the surrounding where the phrase was found.
+
+  User.fulltext_search('hello') => user.snippet == "id like to say\thello\thello to my fellow students"
+  (you have to parse this yourself for now, soon there will be an HTMl alternative)
 
 
 == Bugtracking
 * fork and request pull
 * send a message http://github.com/moro
+
+
+== Origin
+Original is written by scoop see
+* http://github.com/scoop/acts_as_searchable/tree/master
+* http://poocs.net/2006/4/6/introducing-acts-as-searchable
+
+This fork is maintained by MOROHASHI Kyosuke
+* http://github.com/moro/search_do/tree/master
