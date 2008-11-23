@@ -3,9 +3,10 @@ require 'search_do/backends/hyper_estraier'
 module SearchDo::Backends
   module HyperEstraier::EstraierPureExtention
     def self.included(base)
-      base.const_get("Node").send(:include, Node)
-      base.const_get("Condition").send(:include, Condition)
-      base.const_get("NodeResult").send(:include, NodeResult)
+      [Node,Condition,NodeResult,ResultDocument].each do |klas|
+        basic_class_name = klas.to_s.split('::').last
+        base.const_get(basic_class_name).send(:include, klas)
+      end
     end
 
     module Node
@@ -39,6 +40,18 @@ module SearchDo::Backends
       def docs; map{|e| e } ; end
 
       def first_doc; get_doc(0); end
+    end
+
+    module ResultDocument
+      #wacky snippet string parsed into a nice array of lines
+      #where the found word (here: a search for bob) is marked to be highlighted
+      #[["hallo my name is ",false],["bob",true],[" butcher",false]]
+      def snippets
+        snip = @snippet.sub(/^\.+/,"\n")#first ... can be understood as \n
+        snip.split("\n").reject{|x|x==''}.map do |part|
+          part.include?("\t") ? [part.split("\t")[0],true] : [part,false]
+        end
+      end
     end
   end
 end
