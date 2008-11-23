@@ -29,7 +29,8 @@ A working Hyper Estraier instance, setup instructions:
       #fields used for attribute search/ordering
       :attributes => {:name=>nil,:city=>nil,:country=>nil,:age=>nil}
     )
-    attr_accessor :snippet #add this to get snippets on your results (see below)
+    attr_accessor :html_snippet #add this to get html snippets on your results (see below)
+    attr_accessor :snippet #add this to get pure-snippets(not recommended) on your results
   end
 
   #SEARCH
@@ -46,9 +47,10 @@ A working Hyper Estraier instance, setup instructions:
   Each record found with a fulltext-search (not a attribute-only search) contains a snippet
   of the surrounding where the phrase was found.
 
-  User.fulltext_search('hello') => user.snippet == "id like to say\thello\thello to my fellow students"
-  (you have to parse this yourself for now, soon there will be an HTMl alternative)
+  User.fulltext_search('hello') => user.html_snippet == "id like to say <b>hello</b> to my fellow students"
 
+  NOTE: html_snippet will not contain HTML except for the <b>, so there is no need to escape it.
+  
 
 == Bugtracking
 * fork and request pull
