@@ -44,7 +44,7 @@ describe SearchDo::Backends::HyperEstraier do
       @backend.raw(1).attr('db_id').should == '1'
     end
   end
-  
+
   describe :build_fulltext_condition do
     it "does not use limit for counting" do
       @backend.send(:build_fulltext_condition,'',:count=>true).max.should == -1

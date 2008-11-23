@@ -87,6 +87,21 @@ describe Story, "extended by acts_as_searchable_enhance" do
     end
   end
 
+  describe :snippet_to_html do
+    it "surrounds snippets with bold" do
+      Story.send(:snippet_to_html,[['x',true],['y',false]]).should == "<b>x</b>y"
+    end
+
+    it "removes tags html" do#since they would get broken up
+      Story.send(:snippet_to_html,[['ab</b>ab',true],['y',false]]).should == "<b>abab</b>y"
+      Story.send(:snippet_to_html,[['ab<br>ab',true],['y',false]]).should == "<b>abab</b>y"
+    end
+
+    it "strips tags" do
+      Story.send(:snippet_to_html,[['ab<a>x</a>ab',true],['y',false]]).should == "<b>abxab</b>y"
+    end
+  end
+
   describe "fulltext_search" do
     #matched_ids_and_raw => [:id,raw] and find_option=>{:condition => 'id = :id'}
     
@@ -116,6 +131,7 @@ describe Story, "extended by acts_as_searchable_enhance" do
     end
     
     it "does not add snippet when object does not respond to snippet=" do
+      @story.stub!(:respond_to?).with(:html_snippet=)
       @story.should_receive(:respond_to?).with(:snippet=).and_return false
       Story.should_receive(:find).and_return [@story]
       fulltext_search[0].snippet.should be_blank

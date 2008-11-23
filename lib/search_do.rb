@@ -246,7 +246,21 @@ module SearchDo
       results.each do |result|
         raw = ids_and_raw.assoc(result.id)[1]
         result.snippet = raw.snippet if result.respond_to?(:snippet=)
+        result.html_snippet = snippet_to_html(raw.snippet_a) if result.respond_to?(:html_snippet=)
       end
+    end
+
+    def snippet_to_html(snippet)
+      snippet.map do |text,highlite|
+        text = strip_tags(text)
+        highlite ? "<b>#{text}</b>" : text
+      end * ''
+    end
+
+    def strip_tags(text)
+      #TODO better performance?
+      require 'action_controller'
+      ::ActionController::Base.helpers.strip_tags(text)
     end
   
     def connect_backend(active_record_config) #:nodoc:

@@ -46,7 +46,8 @@ module SearchDo::Backends
       #wacky snippet string parsed into a nice array of lines
       #where the found word (here: a search for bob) is marked to be highlighted
       #[["hallo my name is ",false],["bob",true],[" butcher",false]]
-      def snippets
+      #output does not contain HTML
+      def snippet_a
         snip = @snippet.sub(/^\.+/,"\n")#first ... can be understood as \n
         snip.split("\n").reject{|x|x==''}.map do |part|
           part.include?("\t") ? [part.split("\t")[0],true] : [part,false]
