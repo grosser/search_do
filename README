@@ -1,16 +1,14 @@
 = search_do
-
-Library for fulltext search integration with active record using multiple backends.
-
-Supports:
-Hyper Estraier (http://hyperestraier.sourceforge.net/) an ActiveRecord model.
+* Library for fulltext search integration with active record.
+* Build to support multiple search Backends
+* acts_as_searchable Successor
 
 
 == Pre-requisites
 A working Hyper Estraier instance, setup instructions:
 
-* http://hyperestraier.sourceforge.net/nguide-en.html
-* http://pragmatig.wordpress.com/2008/05/06/getting-started-with-acts_as_searchable-on-ubuntu/
+* Setup Instructions: http://pragmatig.wordpress.com/2008/05/06/getting-started-with-acts_as_searchable-on-ubuntu/
+* In-depth Documentation: http://hyperestraier.sourceforge.net/nguide-en.html
 * rake search:node:create MODEL=User RAILS_ENV=production - for every model/environment you use
 
 
@@ -30,7 +28,6 @@ A working Hyper Estraier instance, setup instructions:
       :attributes => {:name=>nil,:city=>nil,:country=>nil,:age=>nil}
     )
     attr_accessor :html_snippet #add this to get html snippets on your results (see below)
-    attr_accessor :snippet #add this to get pure-snippets(not recommended) on your results
   end
 
   #SEARCH
@@ -41,7 +38,7 @@ A working Hyper Estraier instance, setup instructions:
    - sorted by age ASC
   @results = User.paginate_by_fulltext_search('hello',:attributes=>{:website=>'www',:age=>1},:order=>'age ASC',:page=>1,:per_page=>20)
 
-  (Same can be done without pagination magic: User.fulltext_search)
+  (Same can be done without pagination: User.fulltext_search)
 
   #SNIPPETS
   Each record found with a fulltext-search (not a attribute-only search) contains a snippet
@@ -50,17 +47,17 @@ A working Hyper Estraier instance, setup instructions:
   User.fulltext_search('hello') => user.html_snippet == "id like to say <b>hello</b> to my fellow students"
 
   NOTE: html_snippet will not contain HTML except for the <b>, so there is no need to escape it.
-  
 
-== Bugtracking
-* fork and request pull
-* send a message http://github.com/moro
+
+== Hyperestraier Features
+ - Phrase search, regular expressions, attribute search, and similarity search
+ - Snippet retrival
+ - UTF8 support
+ - Web interface
+ - Built in P2P clustering of index servers
 
 
 == Origin
 Original is written by scoop see
 * http://github.com/scoop/acts_as_searchable/tree/master
 * http://poocs.net/2006/4/6/introducing-acts-as-searchable
-
-Another fork is maintained by MOROHASHI Kyosuke
-* http://github.com/moro/search_do/tree/master
