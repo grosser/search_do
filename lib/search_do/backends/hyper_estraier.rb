@@ -126,7 +126,7 @@ module SearchDo
         add_attributes_to(options[:attributes],cond)
         cond.set_max   options[:limit] unless options[:count]
         cond.set_skip  options[:offset]
-        cond.set_order translate_order_to_he(options[:order]) if options[:order]
+        cond.set_order translate_order_to_he(options[:order]) unless options[:order].blank?
         return cond
       end
       

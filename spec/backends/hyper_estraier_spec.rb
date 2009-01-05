@@ -129,6 +129,14 @@ describe SearchDo::Backends::HyperEstraier do
         @backend.send(:build_fulltext_condition,'',:order=>order).order
       end
 
+      it "translates nil to nil" do
+        translated_order(nil).should == nil
+      end
+
+      it "translates blank to nil" do
+        translated_order("").should == nil
+      end
+
       it "translates strings to STRA" do
         translated_order('title ASC').should == 'title STRA'
         translated_order('title asc').should == 'title STRA'
