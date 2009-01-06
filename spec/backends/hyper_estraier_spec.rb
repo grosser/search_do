@@ -5,17 +5,17 @@ describe SearchDo::Backends::HyperEstraier do
     @backend = SearchDo::Backends::HyperEstraier.new(Story, ActiveRecord::Base.configurations["test"]["estraier"])
   end
 
-  describe "#index // there is no index" do
+  describe "without index" do
     before do
       @backend.connection.should_receive(:search).and_return(nil)
     end
 
-    it "should == []" do
+    it "should be empty" do
       @backend.index.should == []
     end
   end
 
-  describe "#add_to_index(['foo',nil]) // include nil to indexed text" do
+  describe "include nil to indexed text" do
     it "should not raise error" do
       lambda{ 
         @backend.add_to_index(['foo', nil], {})
@@ -23,14 +23,22 @@ describe SearchDo::Backends::HyperEstraier do
     end
   end
 
-  describe "#add_to_index([Time.local(2008,9,17)]) // include nil to indexed text" do
+  describe "date searching" do
     before do
+      @backend.clear_index!
       @time = Time.local(2008,9,17)
       @backend.add_to_index([@time], 'db_id' => "1", '@uri' => "/Story/1")
     end
 
-    it "should searchable with '2008-09-17T00:00:00'" do
+    it "should searchable with time in iso format" do
       @backend.count(@time.iso8601).should > 0
+    end
+
+    it "is ordered through dates" do
+      @backend.add_to_index([], 'db_id' => "1", 'read_at'=>Time.now, '@uri' => "/Story/1")
+      @backend.add_to_index([], 'db_id' => "2", 'read_at'=>Time.now+1.day, '@uri' => "/Story/2")
+      @backend.add_to_index([], 'db_id' => "3", 'read_at'=>Time.now-1.day, '@uri' => "/Story/3")
+      @backend.search_all_ids('',:order=>"read_at ASC").should == [3,1,2]
     end
   end
   
@@ -210,4 +218,3 @@ describe SearchDo::Backends::HyperEstraier do
     end
   end
 end
-
