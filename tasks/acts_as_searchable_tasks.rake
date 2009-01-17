@@ -1,5 +1,4 @@
 require File.expand_path("../lib/estraier_admin", File.dirname(__FILE__))
-require File.expand_path("config/environment", RAILS_ROOT)
 
 namespace :search do
   desc "Clears HE Index"
@@ -24,14 +23,14 @@ namespace :search do
 
   namespace :node do
     desc "Create HE node"
-    task :create do
+    task :create => :environment do
       raise "Pass a searchable model with MODEL=" unless ENV['MODEL']
       model_class = ENV['MODEL'].constantize
       admin.create_node(model_class.search_backend.node_name)
     end
 
     desc "Delete HE node"
-    task :delete do
+    task :delete => :environment do
       raise "Pass a searchable model with MODEL=" unless ENV['MODEL']
       model_class = ENV['MODEL'].constantize
       admin.delete_node(model_class.search_backend.node_name)
@@ -69,4 +68,3 @@ namespace :search do
     end
   end
 end
-
