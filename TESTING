@@ -1,16 +1,6 @@
-#Install:
-sqlite -- http://wiki.rubyonrails.org/rails/pages/RailsOnUbuntu
-gem install rspec
+If you have test errors by HyperEstraier, change cache settings:
 
-#Run
-rake spec
-
-# NOTICE
-
-if you have test errors by HyperEstraier cache matter
 edit '${estraier_index_dir}/_conf' and set 'cachernum' parameter to 0.
 (Ubuntu: /var/lib/hyperestraier/estmaster/_conf)
 then restart hyperestraier
 (Ubuntu: sudo /etc/init.d/hyperestraier restart)
-
-
