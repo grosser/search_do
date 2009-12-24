@@ -13,8 +13,12 @@ A working Hyper Estraier instance, setup instructions:
 
 
 == Install
-* script/plugin install git://github.com/grosser/search_do.git
-* install will_paginate to use "paginate_by_fulltext_search" (Instruction: http://github.com/mislav/will_paginate/wikis/installation)
+As Rails plugin(recommended <-> rake tasks/cap recipes):
+  script/plugin install git://github.com/grosser/search_do.git
+Or as Gem:
+  sudo gem install searh_do
+
+install will_paginate to use "paginate_by_fulltext_search" (Instruction: http://github.com/mislav/will_paginate/wikis/installation)
 
 
 == Usage
