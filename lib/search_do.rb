@@ -327,3 +327,4 @@ module SearchDo
   end
 end
 
+ActiveRecord::Base.send :include, SearchDo
