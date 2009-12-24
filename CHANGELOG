@@ -1,1 +1,1 @@
- - added html_snippet (attr_accessort :html_snippet)
+ - added html_snippet (attr_accessor :html_snippet)
