@@ -25,7 +25,7 @@ Rake::RDocTask.new(:rdoc) do |doc|
   doc.rdoc_dir = 'rdoc'
   doc.title    = 'SearchDo'
   doc.options << '--line-numbers' << '--inline-source'
-  doc.rdoc_files.include('README')
+  doc.rdoc_files.include('README.rdoc')
   doc.rdoc_files.include('lib/**/*.rb')
 end
 
