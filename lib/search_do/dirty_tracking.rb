@@ -4,7 +4,7 @@ require 'search_do/dirty_tracking/bridge'
 module SearchDo
   module DirtyTracking
     def self.included(base)
-      mod = if defined?(ActiveRecord::Dirty) && base.included_modules.include?(ActiveRecord::Dirty)
+      mod = if defined?(ActiveModel::Dirty) && base.included_modules.include?(ActiveModel::Dirty)
               DirtyTracking::Bridge
             else
               DirtyTracking::SelfMade
