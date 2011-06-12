@@ -936,7 +936,7 @@ module EstraierPure
                 sock.printf("%s\r\n", line)
               end
             end
-            sock.printf("Content-Length: %d\r\n", reqbody.length) if reqbody
+            sock.printf("Content-Length: %d\r\n", reqbody.bytesize) if reqbody
             sock.printf("\r\n")
             sock.write(reqbody) if reqbody
             line = sock.gets.chomp
