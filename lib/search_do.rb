@@ -264,8 +264,8 @@ module SearchDo
     end
 
     def connect_backend(active_record_config) #:nodoc:
-      backend_config = active_record_config[RAILS_ENV]['search'] || \
-                       active_record_config[RAILS_ENV]['estraier'] || {}
+      backend_config = active_record_config[Rails.env]['search'] || \
+                       active_record_config[Rails.env]['estraier'] || {}
       self.search_backend = Backends.connect(self, backend_config)
     end
 

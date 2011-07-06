@@ -197,7 +197,7 @@ module SearchDo
       end
 
       def calculate_node_name(config)
-        node_prefix = config['node_prefix'] || config['node'] || RAILS_ENV
+        node_prefix = config['node_prefix'] || config['node'] || Rails.env
         "#{node_prefix}_#{@ar_class.table_name}"
       end
 
