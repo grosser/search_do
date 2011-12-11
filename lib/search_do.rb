@@ -118,7 +118,7 @@ module SearchDo
 
       cattr_accessor :search_indexer, :search_backend
 
-      self.search_indexer = returning(SearchDo::Indexer.new(self, configurations)) do |idx|
+      self.search_indexer = SearchDo::Indexer.new(self, configurations).tap do |idx|
         idx.searchable_fields   = options[:searchable_fields] || [ :body ]
         idx.attributes_to_store = options[:attributes] || {}
         idx.if_changed          = options[:if_changed] || []
@@ -173,7 +173,7 @@ module SearchDo
 
       ids_and_raw = matched_ids_and_raw(query, options)
       ids = ids_and_raw.map{|id,raw| id}
-      
+
       results = find_by_ids_scope(ids, find_options)
       add_snippets(results,ids_and_raw) unless query.blank?
       results
@@ -187,7 +187,7 @@ module SearchDo
         options[:offset]=(page.to_i-1)*per_page
         options.delete(:page)#acts_as cannot read this...
         options.delete(:per_page)#acts_as cannot read this...
-        
+
         #find results
         pager.replace fulltext_search(query,options)
 
@@ -216,7 +216,7 @@ module SearchDo
     def matched_ids_and_raw(query = "", options = {})
       search_backend.search_all_ids_and_raw(query, options)
     end
-    
+
     def matched_ids(query = "", options = {})
       matched_ids_and_raw(query,options).map{|id,raw|id}
     end
@@ -241,7 +241,7 @@ module SearchDo
     end
 
   private
-  
+
     def add_snippets(results,ids_and_raw)
       results.each do |result|
         raw = ids_and_raw.assoc(result.id)[1]
@@ -262,7 +262,7 @@ module SearchDo
       require 'action_controller'
       ::ActionController::Base.helpers.strip_tags(text)
     end
-  
+
     def connect_backend(active_record_config) #:nodoc:
       backend_config = active_record_config[RAILS_ENV]['search'] || \
                        active_record_config[RAILS_ENV]['estraier'] || {}
@@ -277,7 +277,7 @@ module SearchDo
       end
       apply_ids_order_to(ids,results)
     end
-    
+
     def apply_ids_order_to(ids,results)
       #replace id with found item
       results.each {|item| ids[ids.index(item.id)] = item}
