@@ -1,9 +1,9 @@
 source :rubygems
 
-gem 'activerecord', ENV['RAILS']
+gem 'activerecord'
 
 group :dev do
-  gem 'actionpack', ENV['RAILS']
+  gem 'rails', ENV['RAILS']
   gem 'sqlite3'
   gem 'will_paginate'
   gem 'rdoc'

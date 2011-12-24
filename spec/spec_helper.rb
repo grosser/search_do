@@ -7,7 +7,12 @@ require 'active_record'
 
 require File.expand_path("../init", File.dirname(__FILE__))
 
-RAILS_ENV = "test"
+module Rails
+  def self.env
+    'test'
+  end
+end
+
 ActiveRecord::Base.configurations = {"test" => {
   :adapter => "sqlite3",
   :database => ":memory:",
