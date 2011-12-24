@@ -14,7 +14,7 @@ A working Hyper Estraier instance, setup instructions:
 
 == Install
 As Rails plugin(recommended <-> rake tasks/cap recipes):
-  script/plugin install git://github.com/grosser/search_do.git
+  rails plugin install git://github.com/grosser/search_do.git
 Or as Gem:
   sudo gem install searh_do
 
