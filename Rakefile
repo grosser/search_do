@@ -1,23 +1,7 @@
-require 'rake/rdoctask'
-require 'spec'
+require 'rdoc/task'
 
-desc 'Default: run specs_all.'
-task :default => :spec_all
-
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new {|t| t.spec_opts = ['--color']}
-
-desc "Run specs both AR-latest and AR-2.0.x"
-task :spec_all do
-  ar20xs = (::Gem.source_index.find_name("activerecord", "<2.1") & \
-            ::Gem.source_index.find_name("activerecord", ">=2.0"))
-  if ar20xs.empty?
-    Rake::Task[:spec].invoke
-  else
-    ar20 = ar20xs.sort_by(&:version).last
-    system("rake spec")
-    system("rake spec AR=#{ar20.version}")
-  end
+task :default do
+  sh "bundle exec rspec spec"
 end
 
 desc 'Generate documentation for the acts_as_searchable plugin.'

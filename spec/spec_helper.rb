@@ -1,7 +1,6 @@
 # ---- requirements
 $KCODE = 'u' #activate regex unicode
-require 'rubygems'
-require 'spec'
+require 'rspec'
 $LOAD_PATH << File.expand_path("../lib", File.dirname(__FILE__))
 
 
