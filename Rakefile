@@ -7,7 +7,7 @@ end
 task :default do
   sh "RAILS=2.3.14 && (bundle || bundle install) && bundle exec rake spec"
   sh "RAILS=3.0.12 && (bundle || bundle install) && bundle exec rake spec"
-  sh "RAILS=3.1.2 && (bundle || bundle install) && bundle exec rake spec"
+  sh "RAILS=3.1.3 && (bundle || bundle install) && bundle exec rake spec"
   sh "git checkout Gemfile.lock"
 end
 
