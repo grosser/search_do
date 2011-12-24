@@ -61,6 +61,10 @@ install will_paginate to use "paginate_by_fulltext_search" (Instruction: http://
  - Built in P2P clustering of index servers
 
 
+== TODO
+ - make specs work with RSpec 2
+
+
 == Origin
 Original is written by scoop see
 * http://github.com/scoop/acts_as_searchable/tree/master

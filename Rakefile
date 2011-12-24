@@ -29,7 +29,7 @@ begin
     gem.summary = "AR: Hyperestraier integration"
     gem.email = "moronatural@gmail.com"
     gem.homepage = "http://github.com/grosser/#{project_name}"
-    gem.authors = ["MOROHASHI Kyosuke"]
+    gem.authors = ["MOROHASHI Kyosuke", "Michael Grosser"]
   end
 
   Jeweler::GemcutterTasks.new
