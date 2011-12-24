@@ -1,7 +1,7 @@
 require 'rdoc/task'
 
 task :default do
-  sh "bundle exec rspec spec"
+  sh "bundle exec spec spec"
 end
 
 desc 'Generate documentation for the acts_as_searchable plugin.'
